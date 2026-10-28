@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}Audit Reports & Export | Hospital Patient Data Analysis System{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+  <div>
+    <h2 class="h5 fw-bold mb-1">Hospital Clinical Audit & Summary Reports</h2>
+    <p class="text-muted small mb-0">Generate executive throughput summaries and download structured CSV records for offline statistical analysis.</p>
+  </div>
+  <div class="d-flex gap-2">
+    <button onclick="window.print()" class="btn btn-outline-secondary btn-sm">
+      <i class="bi bi-printer me-1"></i> Print Report
+    </button>
+    <a href="{{ url_for('export_csv') }}" class="btn btn-primary btn-sm">
+      <i class="bi bi-download me-1"></i> Download Full CSV Dataset
+    </a>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-12 col-lg-8">
+    <div class="content-card">
+      <div class="card-title-header border-bottom pb-2 mb-3">
+        <span><i class="bi bi-clipboard-pulse me-2 text-primary"></i>Executive Clinical Audit Report</span>
+        <span class="badge bg-light text-muted border">Generated: Today</span>
+      </div>
+
+      <div class="mb-4">
+        <h6 class="fw-bold text-dark mb-2">1. Hospital Capacity & Volume Overview</h6>
+        <p class="text-muted small">
+          During the active recording window, a total of <strong>{{ total_records }}</strong> patient visits were processed across 
+          <strong>{{ analysis.dept_counts | length }}</strong> clinical departments. Mean patient age stands at <strong>{{ analysis.mean_age }} years</strong> 
+          (standard deviation: {{ analysis.std_age }}), spanning pediatric to geriatric demographics (minimum {{ analysis.min_age }} yrs, maximum {{ analysis.max_age }} yrs).
+        </p>
+      </div>
+
+      <div class="mb-4">
+        <h6 class="fw-bold text-dark mb-2">2. Department Distribution Summary</h6>
+        <div class="table-responsive">
+          <table class="table table-custom table-sm align-middle mb-0">
+            <thead>
+              <tr>
+                <th>Department</th>
+                <th>Patient Count</th>
+                <th>Volume Share</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for dept, count in analysis.dept_counts.items() %}
+              <tr>
+                <td class="fw-medium">{{ dept }}</td>
+                <td class="tabular-nums fw-bold">{{ count }}</td>
+                <td class="tabular-nums">
+                  {% if total_records > 0 %}{{ ((count / total_records) * 100) | round(1) }}%{% else %}0%{% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div>
+        <h6 class="fw-bold text-dark mb-2">3. Disposition & Outcome Analysis</h6>
+        <p class="text-muted small">
+          A total of <strong>{{ analysis.discharge_counts.get('Discharged', 0) }}</strong> patients were successfully discharged, 
+          while <strong>{{ analysis.discharge_counts.get('Admitted', 0) }}</strong> required inpatient bed admission, and 
+          <strong>{{ analysis.discharge_counts.get('Under Observation', 0) }}</strong> were placed in observation wards.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-lg-4">
+    <div class="content-card">
+      <div class="card-title-header border-bottom pb-2 mb-3">
+        <span><i class="bi bi-file-earmark-spreadsheet me-2 text-success"></i>Data Export Center</span>
+      </div>
+      <p class="text-muted small mb-3">Export raw data or aggregated metrics for external analysis in Python Jupyter Notebook, R, or Microsoft Excel.</p>
+
+      <div class="d-grid gap-2">
+        <a href="{{ url_for('export_csv') }}" class="btn btn-outline-primary btn-sm text-start py-2">
+          <div class="d-flex align-items-center justify-content-between">
+            <div>
+              <div class="fw-bold"><i class="bi bi-file-earmark-csv me-1"></i> Patient Records (CSV)</div>
+              <small class="text-muted">Complete dataset with all {{ total_records }} rows</small>
+            </div>
+            <i class="bi bi-arrow-down-circle fs-5"></i>
+          </div>
+        </a>
+
+        <div class="p-3 bg-light rounded border mt-3">
+          <h6 class="fw-bold small text-dark mb-1">Data Governance & Ethics</h6>
+          <p class="text-muted small mb-0">
+            In compliance with healthcare privacy regulations (HIPAA/GDPR principles), exports omit direct patient identifiers. Record IDs are synthetic hashes.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

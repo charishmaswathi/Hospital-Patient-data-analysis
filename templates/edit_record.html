@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Record {{ record_id }} | Hospital Patient Data Analysis System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-md-8 col-lg-7">
+    <div class="content-card">
+      <div class="card-title-header border-bottom pb-3 mb-4">
+        <div>
+          <h2 class="h5 fw-bold mb-1">Edit Record: <span class="text-primary font-mono">{{ record_id }}</span></h2>
+          <p class="text-muted small mb-0">Update clinical details and discharge disposition.</p>
+        </div>
+        <a href="{{ url_for('records_view') }}" class="btn btn-outline-secondary btn-sm">
+          <i class="bi bi-arrow-left me-1"></i> Back to List
+        </a>
+      </div>
+
+      <form id="patientRecordForm" method="POST" action="{{ url_for('edit_record', record_id=record_id) }}">
+        <div class="row g-3">
+          <!-- Age -->
+          <div class="col-12 col-sm-6">
+            <label for="age" class="form-label fw-semibold small">Patient Age (0 - 120 yrs) <span class="text-danger">*</span></label>
+            <input type="number" class="form-control" id="age" name="age" min="0" max="120" step="1" required value="{{ record.age }}">
+          </div>
+
+          <!-- Visit Date -->
+          <div class="col-12 col-sm-6">
+            <label for="visit_date" class="form-label fw-semibold small">Visit Date <span class="text-danger">*</span></label>
+            <input type="date" class="form-control" id="visit_date" name="visit_date" required value="{{ record.visit_date }}">
+          </div>
+
+          <!-- Department -->
+          <div class="col-12 col-sm-6">
+            <label for="department" class="form-label fw-semibold small">Department <span class="text-danger">*</span></label>
+            <select class="form-select" id="department" name="department" required>
+              {% for d in departments %}
+                <option value="{{ d }}" {% if record.department == d %}selected{% endif %}>{{ d }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Discharge Status -->
+          <div class="col-12 col-sm-6">
+            <label for="discharge_status" class="form-label fw-semibold small">Discharge Status <span class="text-danger">*</span></label>
+            <select class="form-select" id="discharge_status" name="discharge_status" required>
+              {% for s in discharge_statuses %}
+                <option value="{{ s }}" {% if record.discharge_status == s %}selected{% endif %}>{{ s }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Diagnosis Category -->
+          <div class="col-12">
+            <label for="diagnosis_category" class="form-label fw-semibold small">Diagnosis Category <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="diagnosis_category" name="diagnosis_category" required minlength="3" value="{{ record.diagnosis_category }}">
+          </div>
+
+          <!-- De-identified Clinical Notes -->
+          <div class="col-12">
+            <label for="notes" class="form-label fw-semibold small">Clinical Observation Notes (Optional)</label>
+            <textarea class="form-control" id="notes" name="notes" rows="3">{{ record.notes or '' }}</textarea>
+          </div>
+
+          <div class="col-12 d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+            <a href="{{ url_for('records_view') }}" class="btn btn-outline-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-save me-1"></i> Update Record
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

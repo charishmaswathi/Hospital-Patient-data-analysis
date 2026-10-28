@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block title %}Data Analytics & EDA | Hospital Patient Data Analysis System{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+  <div>
+    <h2 class="h5 fw-bold mb-1">Exploratory Data Analysis (EDA) & Data Quality</h2>
+    <p class="text-muted small mb-0">Powered by Python <code class="text-primary">pandas.DataFrame</code> statistical modeling and data hygiene checks.</p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{{ url_for('export_csv') }}" class="btn btn-outline-primary btn-sm">
+      <i class="bi bi-file-earmark-arrow-down me-1"></i> Download Dataset CSV
+    </a>
+  </div>
+</div>
+
+<!-- Pandas Statistical Summary on Age -->
+<div class="content-card mb-4">
+  <div class="card-title-header">
+    <span><i class="bi bi-calculator me-2 text-primary"></i>Pandas Age Demographics Summary (<code class="small">df['age'].describe()</code>)</span>
+    <span class="badge bg-light text-dark border">Sample Size: {{ analysis.total_records }} rows</span>
+  </div>
+  <div class="row g-3 text-center">
+    <div class="col-6 col-md-2">
+      <div class="p-3 bg-light rounded border">
+        <small class="text-muted d-block mb-1">Mean Age</small>
+        <div class="h4 fw-bold tabular-nums text-primary mb-0">{{ analysis.mean_age }} yrs</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-2">
+      <div class="p-3 bg-light rounded border">
+        <small class="text-muted d-block mb-1">Median Age</small>
+        <div class="h4 fw-bold tabular-nums text-dark mb-0">{{ analysis.median_age }} yrs</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-2">
+      <div class="p-3 bg-light rounded border">
+        <small class="text-muted d-block mb-1">Std Deviation (σ)</small>
+        <div class="h4 fw-bold tabular-nums text-dark mb-0">{{ analysis.std_age }}</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-2">
+      <div class="p-3 bg-light rounded border">
+        <small class="text-muted d-block mb-1">Min Age</small>
+        <div class="h4 fw-bold tabular-nums text-dark mb-0">{{ analysis.min_age }} yrs</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-2">
+      <div class="p-3 bg-light rounded border">
+        <small class="text-muted d-block mb-1">Max Age</small>
+        <div class="h4 fw-bold tabular-nums text-dark mb-0">{{ analysis.max_age }} yrs</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-2">
+      <div class="p-3 bg-light rounded border">
+        <small class="text-muted d-block mb-1">Identified Duplicates</small>
+        <div class="h4 fw-bold tabular-nums {% if analysis.duplicate_count == 0 %}text-success{% else %}text-danger{% endif %} mb-0">
+          {{ analysis.duplicate_count }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Data Hygiene & Missing Value Audit -->
+<div class="row g-4 mb-4">
+  <div class="col-12 col-lg-6">
+    <div class="content-card h-100">
+      <div class="card-title-header">
+        <span><i class="bi bi-shield-check me-2 text-success"></i>Data Hygiene: Missing Value Audit</span>
+        <small class="text-muted">Completeness Check</small>
+      </div>
+      <p class="text-muted small">Assessing dataset integrity for future Machine Learning pipelines (<code class="small">df.isnull().sum()</code>).</p>
+      <div class="table-responsive">
+        <table class="table table-custom table-sm align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Feature Column</th>
+              <th>Missing Count</th>
+              <th>Missing Ratio</th>
+              <th>Data Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in analysis.missing_report %}
+            <tr>
+              <td class="fw-medium font-mono small">{{ item.column }}</td>
+              <td class="tabular-nums">{{ item.missing }}</td>
+              <td class="tabular-nums">{{ item.percentage }}%</td>
+              <td>
+                {% if item.missing == 0 %}
+                  <span class="badge bg-success-subtle text-success"><i class="bi bi-check-circle me-1"></i>Clean</span>
+                {% else %}
+                  <span class="badge bg-warning-subtle text-warning">Incomplete</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-lg-6">
+    <div class="content-card h-100">
+      <div class="card-title-header">
+        <span><i class="bi bi-pie-chart-fill me-2 text-primary"></i>Age-Group Demographics Breakdown</span>
+        <small class="text-muted">Clinical Bands</small>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-custom table-sm align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Age Group Band</th>
+              <th>Patient Count</th>
+              <th>Distribution Ratio</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for grp, count in analysis.age_group_counts.items() %}
+            <tr>
+              <td class="fw-semibold">{{ grp }}</td>
+              <td class="tabular-nums fw-bold">{{ count }}</td>
+              <td class="tabular-nums">
+                {% if analysis.total_records > 0 %}
+                  {{ ((count / analysis.total_records) * 100) | round(1) }}%
+                {% else %}0%{% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Department vs Discharge Status Cross-Tabulation (Contingency Matrix) -->
+<div class="content-card mb-4">
+  <div class="card-title-header">
+    <span><i class="bi bi-grid-3x3 me-2 text-teal" style="color: #0d9488;"></i>Pandas Cross-Tabulation: Department vs. Discharge Status</span>
+    <small class="text-muted"><code>pd.crosstab(df['department'], df['discharge_status'])</code></small>
+  </div>
+  <p class="text-muted small">Contingency matrix showing clinical flow and disposition per hospital specialty.</p>
+  <div class="table-responsive">
+    <table class="table table-custom table-bordered table-sm align-middle text-center mb-0">
+      <thead>
+        <tr class="table-light">
+          <th class="text-start">Department</th>
+          <th>Discharged</th>
+          <th>Admitted</th>
+          <th>Under Observation</th>
+          <th>Transferred</th>
+          <th>Follow-up Scheduled</th>
+          <th class="table-secondary">Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in analysis.contingency_table %}
+        <tr>
+          <td class="text-start fw-bold">{{ row.department }}</td>
+          <td class="tabular-nums">{{ row.get('Discharged', 0) }}</td>
+          <td class="tabular-nums">{{ row.get('Admitted', 0) }}</td>
+          <td class="tabular-nums">{{ row.get('Under Observation', 0) }}</td>
+          <td class="tabular-nums">{{ row.get('Transferred', 0) }}</td>
+          <td class="tabular-nums">{{ row.get('Follow-up Scheduled', 0) }}</td>
+          <td class="tabular-nums fw-bold table-secondary">{{ row.Total }}</td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="7" class="text-muted py-4">No data available for contingency table.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

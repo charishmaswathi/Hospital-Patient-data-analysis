@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard | Hospital Patient Data Analysis System{% endblock %}
+
+{% block content %}
+<!-- KPI Metric Cards -->
+<div class="row g-3 mb-4">
+  <div class="col-12 col-sm-6 col-xl-3">
+    <div class="stat-card">
+      <div class="d-flex align-items-center justify-content-between mb-2">
+        <span class="text-muted small fw-medium">Total Patient Records</span>
+        <div class="stat-icon bg-primary bg-opacity-10 text-primary">
+          <i class="bi bi-people-fill"></i>
+        </div>
+      </div>
+      <div class="h3 fw-bold mb-1 tabular-nums text-dark">{{ total_records }}</div>
+      <small class="text-success fw-medium"><i class="bi bi-check2-circle me-1"></i>Synchronized with SQLite</small>
+    </div>
+  </div>
+
+  <div class="col-12 col-sm-6 col-xl-3">
+    <div class="stat-card">
+      <div class="d-flex align-items-center justify-content-between mb-2">
+        <span class="text-muted small fw-medium">Total Visits Recorded</span>
+        <div class="stat-icon bg-info bg-opacity-10 text-info">
+          <i class="bi bi-calendar-check"></i>
+        </div>
+      </div>
+      <div class="h3 fw-bold mb-1 tabular-nums text-dark">{{ total_records }}</div>
+      <small class="text-muted">Outpatient & Inpatient logs</small>
+    </div>
+  </div>
+
+  <div class="col-12 col-sm-6 col-xl-3">
+    <div class="stat-card">
+      <div class="d-flex align-items-center justify-content-between mb-2">
+        <span class="text-muted small fw-medium">Hospital Departments</span>
+        <div class="stat-icon bg-teal bg-opacity-10 text-teal" style="color: #0d9488;">
+          <i class="bi bi-building"></i>
+        </div>
+      </div>
+      <div class="h3 fw-bold mb-1 tabular-nums text-dark">{{ total_departments }}</div>
+      <small class="text-muted">Active clinical units</small>
+    </div>
+  </div>
+
+  <div class="col-12 col-sm-6 col-xl-3">
+    <div class="stat-card">
+      <div class="d-flex align-items-center justify-content-between mb-2">
+        <span class="text-muted small fw-medium">Discharged Ratio</span>
+        <div class="stat-icon bg-success bg-opacity-10 text-success">
+          <i class="bi bi-heart-pulse"></i>
+        </div>
+      </div>
+      <div class="h3 fw-bold mb-1 tabular-nums text-dark">
+        {% if total_records > 0 %}
+          {{ ((discharge_tally.get('Discharged', 0) / total_records) * 100) | round(1) }}%
+        {% else %}
+          0%
+        {% endif %}
+      </div>
+      <small class="text-muted">{{ discharge_tally.get('Discharged', 0) }} successful discharges</small>
+    </div>
+  </div>
+</div>
+
+<!-- Interactive Chart Grid -->
+<div class="row g-4 mb-4">
+  <!-- Chart 1: Patients by Department -->
+  <div class="col-12 col-lg-6">
+    <div class="content-card h-100">
+      <div class="card-title-header">
+        <span><i class="bi bi-bar-chart-fill me-2 text-primary"></i>Patient Records by Department</span>
+        <small class="text-muted fw-normal">Distribution</small>
+      </div>
+      <div style="height: 280px; position: relative;">
+        <canvas id="deptChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart 2: Monthly Hospital Visits -->
+  <div class="col-12 col-lg-6">
+    <div class="content-card h-100">
+      <div class="card-title-header">
+        <span><i class="bi bi-graph-up me-2 text-teal" style="color: #0d9488;"></i>Monthly Hospital Visits</span>
+        <small class="text-muted fw-normal">Chronological Trend</small>
+      </div>
+      <div style="height: 280px; position: relative;">
+        <canvas id="monthlyChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart 3: Age-Group Distribution -->
+  <div class="col-12 col-lg-6">
+    <div class="content-card h-100">
+      <div class="card-title-header">
+        <span><i class="bi bi-pie-chart-fill me-2 text-primary"></i>Patient Age-Group Distribution</span>
+        <small class="text-muted fw-normal">Demographics</small>
+      </div>
+      <div style="height: 280px; position: relative;">
+        <canvas id="ageChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart 4: Discharge Status Distribution -->
+  <div class="col-12 col-lg-6">
+    <div class="content-card h-100">
+      <div class="card-title-header">
+        <span><i class="bi bi-pie-chart me-2 text-warning"></i>Discharge-Status Breakdown</span>
+        <small class="text-muted fw-normal">Clinical Disposition</small>
+      </div>
+      <div style="height: 280px; position: relative;">
+        <canvas id="dischargeChart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Recent Records Table Preview -->
+<div class="content-card">
+  <div class="card-title-header">
+    <span><i class="bi bi-clock-history me-2 text-secondary"></i>Recent Hospital Admissions & Visits</span>
+    <a href="{{ url_for('records_view') }}" class="btn btn-outline-primary btn-sm">View All Records</a>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-custom table-hover mb-0">
+      <thead>
+        <tr>
+          <th>Record ID</th>
+          <th>Age</th>
+          <th>Age Group</th>
+          <th>Visit Date</th>
+          <th>Department</th>
+          <th>Diagnosis</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in recent_records %}
+        <tr>
+          <td class="fw-bold text-primary font-mono">{{ r.id }}</td>
+          <td class="tabular-nums">{{ r.age }}</td>
+          <td><span class="text-muted">{{ r.age_group }}</span></td>
+          <td class="tabular-nums">{{ r.visit_date }}</td>
+          <td><span class="fw-medium">{{ r.department }}</span></td>
+          <td>{{ r.diagnosis_category }}</td>
+          <td>
+            <span class="badge 
+              {% if r.discharge_status == 'Discharged' %}bg-success-subtle text-success
+              {% elif r.discharge_status == 'Admitted' %}bg-primary-subtle text-primary
+              {% elif r.discharge_status == 'Under Observation' %}bg-warning-subtle text-warning
+              {% elif r.discharge_status == 'Transferred' %}bg-danger-subtle text-danger
+              {% else %}bg-secondary-subtle text-secondary{% endif %}">
+              {{ r.discharge_status }}
+            </span>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="7" class="text-center py-4 text-muted">No records found. Click 'Reset Sample Data' to populate demo records.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+{% endblock %}

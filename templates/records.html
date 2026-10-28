@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+
+{% block title %}Patient Records | Hospital Patient Data Analysis System{% endblock %}
+
+{% block content %}
+<div class="content-card">
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-3">
+    <div>
+      <h2 class="h5 fw-bold mb-1">Patient Records Management</h2>
+      <p class="text-muted small mb-0">Total matching records: <span class="fw-bold tabular-nums">{{ total_records }}</span></p>
+    </div>
+    <a href="{{ url_for('add_record') }}" class="btn btn-primary btn-sm">
+      <i class="bi bi-person-plus-fill me-1"></i> Add New Record
+    </a>
+  </div>
+
+  <!-- Search & Filter Form -->
+  <form method="GET" action="{{ url_for('records_view') }}" class="row g-2 mb-4 p-3 bg-light rounded border">
+    <div class="col-12 col-md-4">
+      <div class="input-group input-group-sm">
+        <span class="input-group-text bg-white"><i class="bi bi-search text-muted"></i></span>
+        <input type="text" name="search" class="form-control" placeholder="Search ID, diagnosis, notes..." value="{{ current_search }}">
+      </div>
+    </div>
+
+    <div class="col-6 col-md-2">
+      <select name="department" class="form-select form-select-sm">
+        <option value="">All Departments</option>
+        {% for d in departments %}
+          <option value="{{ d }}" {% if current_department == d %}selected{% endif %}>{{ d }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="col-6 col-md-2">
+      <select name="discharge_status" class="form-select form-select-sm">
+        <option value="">All Statuses</option>
+        {% for s in discharge_statuses %}
+          <option value="{{ s }}" {% if current_status == s %}selected{% endif %}>{{ s }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="col-6 col-md-2">
+      <select name="age_group" class="form-select form-select-sm">
+        <option value="">All Age Groups</option>
+        {% for ag in age_groups %}
+          <option value="{{ ag }}" {% if current_age_group == ag %}selected{% endif %}>{{ ag }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="col-6 col-md-2 d-flex gap-1">
+      <button type="submit" class="btn btn-primary btn-sm w-100">
+        <i class="bi bi-funnel me-1"></i> Filter
+      </button>
+      {% if current_search or current_department or current_status or current_age_group %}
+        <a href="{{ url_for('records_view') }}" class="btn btn-outline-secondary btn-sm" title="Clear Filters">
+          <i class="bi bi-x-lg"></i>
+        </a>
+      {% endif %}
+    </div>
+  </form>
+
+  <!-- Table -->
+  <div class="table-responsive">
+    <table class="table table-custom table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Record ID</th>
+          <th>Age</th>
+          <th>Age Group</th>
+          <th>Visit Date</th>
+          <th>Department</th>
+          <th>Diagnosis Category</th>
+          <th>Discharge Status</th>
+          <th>Notes</th>
+          <th class="text-end">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in records %}
+        <tr>
+          <td class="fw-bold text-primary font-mono">{{ r.id }}</td>
+          <td class="tabular-nums">{{ r.age }} yrs</td>
+          <td><span class="text-muted small">{{ r.age_group }}</span></td>
+          <td class="tabular-nums">{{ r.visit_date }}</td>
+          <td><span class="badge bg-light text-dark border">{{ r.department }}</span></td>
+          <td>{{ r.diagnosis_category }}</td>
+          <td>
+            <span class="badge 
+              {% if r.discharge_status == 'Discharged' %}bg-success-subtle text-success
+              {% elif r.discharge_status == 'Admitted' %}bg-primary-subtle text-primary
+              {% elif r.discharge_status == 'Under Observation' %}bg-warning-subtle text-warning
+              {% elif r.discharge_status == 'Transferred' %}bg-danger-subtle text-danger
+              {% else %}bg-secondary-subtle text-secondary{% endif %}">
+              {{ r.discharge_status }}
+            </span>
+          </td>
+          <td class="text-muted small" style="max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+            {{ r.notes or '—' }}
+          </td>
+          <td class="text-end">
+            <div class="btn-group btn-group-sm">
+              <a href="{{ url_for('edit_record', record_id=r.id) }}" class="btn btn-outline-secondary btn-sm" title="Edit">
+                <i class="bi bi-pencil"></i>
+              </a>
+              <form action="{{ url_for('delete_record', record_id=r.id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to permanently delete record {{ r.id }}?');">
+                <button type="submit" class="btn btn-outline-danger btn-sm" title="Delete">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="9" class="text-center py-5 text-muted">
+            <i class="bi bi-inbox fs-2 d-block mb-2 text-secondary"></i>
+            No patient records match the applied criteria.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination Controls -->
+  {% if total_pages > 1 %}
+  <nav class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+    <small class="text-muted">Page {{ page }} of {{ total_pages }}</small>
+    <ul class="pagination pagination-sm mb-0">
+      <li class="page-item {% if page <= 1 %}disabled{% endif %}">
+        <a class="page-link" href="{{ url_for('records_view', page=page-1, search=current_search, department=current_department, discharge_status=current_status, age_group=current_age_group) }}">Previous</a>
+      </li>
+      {% for p in range(1, total_pages + 1) %}
+        <li class="page-item {% if p == page %}active{% endif %}">
+          <a class="page-link" href="{{ url_for('records_view', page=p, search=current_search, department=current_department, discharge_status=current_status, age_group=current_age_group) }}">{{ p }}</a>
+        </li>
+      {% endfor %}
+      <li class="page-item {% if page >= total_pages %}disabled{% endif %}">
+        <a class="page-link" href="{{ url_for('records_view', page=page+1, search=current_search, department=current_department, discharge_status=current_status, age_group=current_age_group) }}">Next</a>
+      </li>
+    </ul>
+  </nav>
+  {% endif %}
+</div>
+{% endblock %}

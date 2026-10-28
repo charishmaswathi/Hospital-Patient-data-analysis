@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Add Patient Record | Hospital Patient Data Analysis System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-md-8 col-lg-7">
+    <div class="content-card">
+      <div class="card-title-header border-bottom pb-3 mb-4">
+        <div>
+          <h2 class="h5 fw-bold mb-1">Add New Patient Record</h2>
+          <p class="text-muted small mb-0">Enter clinical visit details. Record ID will be auto-generated.</p>
+        </div>
+        <a href="{{ url_for('records_view') }}" class="btn btn-outline-secondary btn-sm">
+          <i class="bi bi-arrow-left me-1"></i> Back to List
+        </a>
+      </div>
+
+      <form id="patientRecordForm" method="POST" action="{{ url_for('add_record') }}">
+        <div class="row g-3">
+          <!-- Age -->
+          <div class="col-12 col-sm-6">
+            <label for="age" class="form-label fw-semibold small">Patient Age (0 - 120 yrs) <span class="text-danger">*</span></label>
+            <input type="number" class="form-control" id="age" name="age" min="0" max="120" step="1" required placeholder="e.g. 42" value="{{ form_data.get('age', '') }}">
+            <div class="form-text small">Age group demographic band is computed automatically.</div>
+          </div>
+
+          <!-- Visit Date -->
+          <div class="col-12 col-sm-6">
+            <label for="visit_date" class="form-label fw-semibold small">Visit Date <span class="text-danger">*</span></label>
+            <input type="date" class="form-control" id="visit_date" name="visit_date" required value="{{ form_data.get('visit_date', '') }}">
+            <div class="form-text small">Accepted calendar years: 2000 - 2030.</div>
+          </div>
+
+          <!-- Department -->
+          <div class="col-12 col-sm-6">
+            <label for="department" class="form-label fw-semibold small">Department <span class="text-danger">*</span></label>
+            <select class="form-select" id="department" name="department" required>
+              <option value="" disabled {% if not form_data.get('department') %}selected{% endif %}>Select Hospital Department</option>
+              {% for d in departments %}
+                <option value="{{ d }}" {% if form_data.get('department') == d %}selected{% endif %}>{{ d }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Discharge Status -->
+          <div class="col-12 col-sm-6">
+            <label for="discharge_status" class="form-label fw-semibold small">Discharge Status <span class="text-danger">*</span></label>
+            <select class="form-select" id="discharge_status" name="discharge_status" required>
+              <option value="" disabled {% if not form_data.get('discharge_status') %}selected{% endif %}>Select Discharge Disposition</option>
+              {% for s in discharge_statuses %}
+                <option value="{{ s }}" {% if form_data.get('discharge_status') == s %}selected{% endif %}>{{ s }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Diagnosis Category -->
+          <div class="col-12">
+            <label for="diagnosis_category" class="form-label fw-semibold small">Diagnosis Category <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="diagnosis_category" name="diagnosis_category" required minlength="3" placeholder="e.g. Hypertension Stage 2, Radial Fracture, Migraine" value="{{ form_data.get('diagnosis_category', '') }}">
+            <div class="form-text small">Standard ICD/clinical diagnostic classification.</div>
+          </div>
+
+          <!-- De-identified Clinical Notes -->
+          <div class="col-12">
+            <label for="notes" class="form-label fw-semibold small">Clinical Observation Notes (Optional)</label>
+            <textarea class="form-control" id="notes" name="notes" rows="3" placeholder="Brief anonymized observation notes (treatment given, triage remarks, follow-up advice)">{{ form_data.get('notes', '') }}</textarea>
+            <div class="form-text small text-danger"><i class="bi bi-shield-lock me-1"></i>Privacy Policy: Do not input patient personal identifying information (PII) like names or phone numbers.</div>
+          </div>
+
+          <div class="col-12 d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+            <a href="{{ url_for('records_view') }}" class="btn btn-outline-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-check2-circle me-1"></i> Save Patient Record
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

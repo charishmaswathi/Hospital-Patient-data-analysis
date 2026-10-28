@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block title %}About the Project | Hospital Patient Data Analysis System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-xl-10">
+    <div class="content-card mb-4">
+      <div class="border-bottom pb-3 mb-4">
+        <span class="badge bg-primary-subtle text-primary mb-2">Academic B.Tech Submission</span>
+        <h2 class="h4 fw-bold mb-1">Hospital Patient Data Analysis System</h2>
+        <p class="text-muted small mb-0">2nd-Year B.Tech Computer Science & Engineering (Artificial Intelligence and Machine Learning)</p>
+      </div>
+
+      <!-- Section 1: Project Objectives -->
+      <div class="mb-4">
+        <h5 class="fw-bold text-dark mb-2"><i class="bi bi-bullseye me-2 text-primary"></i>1. Project Objectives</h5>
+        <p class="text-muted small">
+          The primary objective of this project is to architect and develop an integrated web application that enables hospital administrators 
+          to systematically store, organize, filter, and analyze clinical encounter records. By coupling a relational database (SQLite) 
+          with modern exploratory data analysis (EDA) techniques (Pandas) and interactive visualization libraries (Chart.js), 
+          the system bridges the gap between raw healthcare records and actionable operational insights.
+        </p>
+      </div>
+
+      <!-- Section 2: Limitations of Existing Systems -->
+      <div class="mb-4">
+        <h5 class="fw-bold text-dark mb-2"><i class="bi bi-exclamation-triangle me-2 text-warning"></i>2. Limitations of Existing Systems</h5>
+        <div class="row g-3">
+          <div class="col-12 col-md-6">
+            <div class="p-3 bg-light rounded border h-100">
+              <h6 class="fw-semibold text-danger mb-1"><i class="bi bi-x-circle me-1"></i>Manual & Fragmented Registers</h6>
+              <p class="text-muted small mb-0">Many community clinics rely on physical ledger books or disjointed spreadsheet files with zero concurrency controls, leading to duplicate entries and human transcription errors.</p>
+            </div>
+          </div>
+          <div class="col-12 col-md-6">
+            <div class="p-3 bg-light rounded border h-100">
+              <h6 class="fw-semibold text-danger mb-1"><i class="bi bi-x-circle me-1"></i>Lack of Real-Time Analytics</h6>
+              <p class="text-muted small mb-0">Traditional filing systems cannot generate instant visualizations of department load, seasonal admission spikes, or patient demographics without tedious manual calculations.</p>
+            </div>
+          </div>
+          <div class="col-12 col-md-6">
+            <div class="p-3 bg-light rounded border h-100">
+              <h6 class="fw-semibold text-danger mb-1"><i class="bi bi-x-circle me-1"></i>Data Hygiene Vulnerabilities</h6>
+              <p class="text-muted small mb-0">Spreadsheets rarely validate data entry at runtime, allowing impossible age values, invalid calendar dates, or missing required diagnostic categories.</p>
+            </div>
+          </div>
+          <div class="col-12 col-md-6">
+            <div class="p-3 bg-light rounded border h-100">
+              <h6 class="fw-semibold text-danger mb-1"><i class="bi bi-x-circle me-1"></i>Privacy Exposure Risks</h6>
+              <p class="text-muted small mb-0">Unsanitized spreadsheets often mix sensitive personal identifying information (PII) with administrative records, exposing patient identities unnecessarily.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 3: Proposed System & Key Advantages -->
+      <div class="mb-4">
+        <h5 class="fw-bold text-dark mb-2"><i class="bi bi-check2-circle me-2 text-success"></i>3. Proposed System & Advantages</h5>
+        <div class="p-3 bg-primary bg-opacity-10 rounded border border-primary border-opacity-25 mb-3">
+          <p class="small text-dark mb-0">
+            Our proposed system implements a clean client-server architecture with strict input validation, parameterized SQL statements, 
+            automated age-group indexing, real-time Chart.js dashboards, and a dedicated Pandas data quality audit suite.
+          </p>
+        </div>
+        <ul class="text-muted small">
+          <li><strong>Automated Data Hygiene:</strong> Real-time checks for null values, duplicate entries, and out-of-bound inputs.</li>
+          <li><strong>Privacy by Design:</strong> Explicit de-identification; records use randomized PID identifiers rather than patient names or phone numbers.</li>
+          <li><strong>Interactive Visual EDA:</strong> Dynamic bar, line, and doughnut charts directly connected to live database state.</li>
+          <li><strong>High Performance & Portability:</strong> Lightweight SQLite database with zero external server dependencies, running seamlessly on local systems.</li>
+        </ul>
+      </div>
+
+      <!-- Section 4: Software & Hardware Requirements -->
+      <div class="mb-4">
+        <h5 class="fw-bold text-dark mb-2"><i class="bi bi-cpu me-2 text-primary"></i>4. Software & Hardware Requirements</h5>
+        <div class="table-responsive">
+          <table class="table table-custom table-sm mb-0">
+            <thead>
+              <tr>
+                <th>Component</th>
+                <th>Specification / Requirement</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="fw-semibold">Operating System</td>
+                <td>Windows 10/11, Ubuntu 20.04+, macOS Monterey or later</td>
+              </tr>
+              <tr>
+                <td class="fw-semibold">Programming Language</td>
+                <td>Python 3.10+ / JavaScript (ES2022)</td>
+              </tr>
+              <tr>
+                <td class="fw-semibold">Web Framework</td>
+                <td>Flask 3.0+ / Express & Vite</td>
+              </tr>
+              <tr>
+                <td class="fw-semibold">Relational Database</td>
+                <td>SQLite3 (Embedded relational storage)</td>
+              </tr>
+              <tr>
+                <td class="fw-semibold">Data Analysis Library</td>
+                <td>Pandas & NumPy</td>
+              </tr>
+              <tr>
+                <td class="fw-semibold">Frontend Libraries</td>
+                <td>Bootstrap 5.3, Chart.js 4.4, Bootstrap Icons</td>
+              </tr>
+              <tr>
+                <td class="fw-semibold">Minimum Hardware</td>
+                <td>Intel Core i3 / AMD Ryzen 3, 4GB RAM, 500MB free disk space</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Section 5: Future Scope (AI/ML Roadmap) -->
+      <div>
+        <h5 class="fw-bold text-dark mb-2"><i class="bi bi-stars me-2 text-primary"></i>5. AI/ML Roadmap & Future Scope</h5>
+        <div class="row g-3">
+          <div class="col-12 col-md-4">
+            <div class="p-3 bg-light rounded border h-100">
+              <h6 class="fw-semibold text-primary mb-1">1. Length of Stay (LOS) Prediction</h6>
+              <p class="text-muted small mb-0">Train Random Forest / XGBoost regressor models on patient age, department, and diagnosis to forecast anticipated hospitalization days.</p>
+            </div>
+          </div>
+          <div class="col-12 col-md-4">
+            <div class="p-3 bg-light rounded border h-100">
+              <h6 class="fw-semibold text-primary mb-1">2. Readmission Risk Classifier</h6>
+              <p class="text-muted small mb-0">Deploy Logistic Regression or Support Vector Machines to classify patients at high risk of 30-day emergency readmission.</p>
+            </div>
+          </div>
+          <div class="col-12 col-md-4">
+            <div class="p-3 bg-light rounded border h-100">
+              <h6 class="fw-semibold text-primary mb-1">3. Bed Allocation Forecasting</h6>
+              <p class="text-muted small mb-0">Utilize ARIMA / Prophet time-series models on monthly visit trends to forecast bed and oxygen supply demands per department.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

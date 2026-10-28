@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Hospital Patient Data Analysis System{% endblock %}</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="brand-header d-flex align-items-center justify-content-between">
+      <a href="{{ url_for('dashboard') }}" class="d-flex align-items-center gap-2 text-decoration-none">
+        <div class="bg-primary text-white rounded p-1 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+          <i class="bi bi-hospital fs-5"></i>
+        </div>
+        <div class="lh-1">
+          <span class="fw-bold text-dark fs-6 d-block">MediPulse Analytics</span>
+          <small class="text-muted" style="font-size: 0.7rem;">Hospital Data System</small>
+        </div>
+      </a>
+    </div>
+
+    <ul class="sidebar-nav">
+      <li class="nav-item">
+        <a href="{{ url_for('dashboard') }}" class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}">
+          <i class="bi bi-grid-1x2"></i>
+          <span>Dashboard</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="{{ url_for('records_view') }}" class="nav-link {% if request.endpoint == 'records_view' %}active{% endif %}">
+          <i class="bi bi-file-earmark-medical"></i>
+          <span>Patient Records</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="{{ url_for('add_record') }}" class="nav-link {% if request.endpoint == 'add_record' %}active{% endif %}">
+          <i class="bi bi-person-plus"></i>
+          <span>Add Record</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="{{ url_for('analytics') }}" class="nav-link {% if request.endpoint == 'analytics' %}active{% endif %}">
+          <i class="bi bi-graph-up-arrow"></i>
+          <span>Data Analytics</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="{{ url_for('reports') }}" class="nav-link {% if request.endpoint == 'reports' %}active{% endif %}">
+          <i class="bi bi-clipboard-data"></i>
+          <span>Reports</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="{{ url_for('about') }}" class="nav-link {% if request.endpoint == 'about' %}active{% endif %}">
+          <i class="bi bi-info-circle"></i>
+          <span>About Project</span>
+        </a>
+      </li>
+    </ul>
+
+    <div class="p-3 border-top position-absolute bottom-0 start-0 end-0 bg-white">
+      <small class="text-muted d-block mb-1" style="font-size: 0.72rem;">2nd-Year B.Tech CSE (AI/ML)</small>
+      <form action="{{ url_for('api_reset_sample') }}" method="POST" onsubmit="return confirm('Reset database with canonical synthetic test records?');">
+        <button type="submit" class="btn btn-outline-secondary btn-sm w-100" style="font-size: 0.75rem;">
+          <i class="bi bi-arrow-counterclockwise me-1"></i> Reset Sample Data
+        </button>
+      </form>
+    </div>
+  </aside>
+
+  <!-- Main Viewport -->
+  <main class="main-content">
+    <!-- Top Bar -->
+    <header class="d-flex align-items-center justify-content-between mb-4 pb-2 border-bottom">
+      <div class="d-flex align-items-center gap-3">
+        <button id="sidebarToggle" class="btn btn-light d-lg-none" type="button" aria-label="Toggle menu">
+          <i class="bi bi-list fs-5"></i>
+        </button>
+        <div>
+          <h1 class="h4 mb-0 fw-bold text-dark">Hospital Patient Data Analysis System</h1>
+          <p class="text-muted small mb-0">Academic Clinical Administration & Pandas Exploratory Data Analytics</p>
+        </div>
+      </div>
+      <div class="d-flex align-items-center gap-2">
+        <a href="{{ url_for('export_csv') }}" class="btn btn-outline-primary btn-sm">
+          <i class="bi bi-download me-1"></i> Export CSV
+        </a>
+        <a href="{{ url_for('add_record') }}" class="btn btn-primary btn-sm">
+          <i class="bi bi-plus-lg me-1"></i> Add Record
+        </a>
+      </div>
+    </header>
+
+    <!-- Educational Disclaimer -->
+    <div class="academic-notice d-flex align-items-center gap-2">
+      <i class="bi bi-shield-check fs-6 text-primary"></i>
+      <span><strong>Educational College Demonstration:</strong> This system uses strictly synthetic records for 2nd-year B.Tech CSE (AI/ML) project analysis. No personal identifying information (PII) is collected or processed. Not intended for actual medical diagnoses.</span>
+    </div>
+
+    <!-- Flash Notifications -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show mb-3" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- Page Body -->
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Bootstrap JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <!-- Main JS -->
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

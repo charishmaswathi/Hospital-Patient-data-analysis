@@ -1,0 +1,6 @@
+{
+  "name": "Hospital Patient Data Analysis System",
+  "description": "Educational hospital patient record management and data analytics dashboard for 2nd-year B.Tech CSE (AI/ML) college project.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
